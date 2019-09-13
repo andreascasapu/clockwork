@@ -49,11 +49,14 @@ private int[] generate_stat_array(int num, float avg, int min, int max, float tr
 }
 
 private void create_UI_boxes() {
-  fluff_box = new UIBox(new Position(0, 0), width * 2f / 3, height * 1f / 3, color(184, 115, 60));
-  resource_box = new UIBox(new Position(width * 2f / 3, 0), width * 1f / 3, height * 1f / 3, color(190, 115, 51));
-  action_box = new UIBox(new Position(0, height * 1f / 3), width, height * 1f / 3, color(184, 115, 51));
+  info_box = new UIBox(new Position(0, 0), width, height * 1f / 9, color(184, 124, 51));
+  active_boxes.add(info_box);
+  action_box = new UIBox(new Position(0, height * 1f / 9), width, height * 5f / 9, color(184, 115, 51));
+  active_boxes.add(action_box);
   stat_box = new UIBox(new Position(0, height * 2f / 3), width * 1f / 3, height * 1f / 3, color(190, 115, 51));
+  active_boxes.add(stat_box);
   dice_box = new UIBox(new Position(width * 1f / 3, height * 2f / 3), width * 2f / 3, height * 1f / 3, color(184, 115, 60));
+  active_boxes.add(dice_box);
 }
 
 private void create_scenes() {
@@ -69,26 +72,10 @@ private void create_scenes() {
   TextBox[][] boxes = new TextBox[stat_names.length][2];
   for (int i = 0; i < stat_names.length; i++) {
     boxes[i][0]= new TextBox(new Position(0, height * 2f / 3 + i * height / 3f / stat_names.length), width / 6f, height / 3f / stat_names.length, stat_names[i], stat_cols[i]);
-    boxes[i][1] = new TextBox(new Position(width / 6f, height * 2f / 3 + i * height / 3f / stat_names.length), width / 6f, height / 3f / stat_names.length, Integer.toString(stat_array[i]), stat_cols[i]);
+    boxes[i][1] = new TextBox(new Position(width / 6f, height * 2f / 3 + i * height / 3f / stat_names.length), width / 6f, height / 3f / stat_names.length, Integer.toString(player_stats.get_stat(i)), stat_cols[i]);
   }
   stats_scene = new Scene(boxes);
   active_scenes.add(stats_scene);
-  
-  boxes = new TextBox[1][2];
-  boxes[0][0] = new TextBox(new Position(width * 2f / 3, height / 12f), width / 6f, height / 6f, resource_names[0], resource_cols[0]);
-  boxes[0][1] = new TextBox(new Position(width * 2f / 3 + width / 6f, height / 12f), width / 6f, height / 6f, Integer.toString(health), resource_cols[0]);
-  resources_scene = new Scene(boxes);
-  active_scenes.add(resources_scene);
-  
-  boxes = new TextBox[equipment_names.length][stat_names.length + 1];
-  for (int i = 0; i < equipment_names.length; i++) {
-    boxes[i][0] = new TextBox(new Position(0, i * height / 3f / equipment_names.length), width * 2f / 9, height / 3f / equipment_names.length, equipment_names[i], equipment_stats[i].exists ? color(255) : color(255 * 0.25f));
-    for (int j = 0; j < stat_names.length; j++) {
-      boxes[i][j + 1] = new TextBox(new Position(width * 2f / 9 + j * width / 3f / stat_names.length , i * height / 3f / equipment_names.length), width / 3f * 2 / 3, height / 3f / equipment_names.length, Integer.toString(equipment_stats[i].get_stat(j)), equipment_stats[i].exists() ? stat_cols[j] : color(red(stat_cols[j]) * 0.45f, green(stat_cols[j]) * 0.45f, blue(stat_cols[j]) * 0.45f));
-    }
-  }
-  equipment_scene = new Scene(boxes);
-  active_scenes.add(equipment_scene);
 }
 
 private void unlock_trays(int num) {

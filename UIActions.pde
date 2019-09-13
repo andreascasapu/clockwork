@@ -52,9 +52,8 @@ private void print_text_in_box(float font_size, String text, PFont font, color c
 }
 
 private void draw_layout() {
-  UIBox boxes[] = {fluff_box, resource_box, action_box, stat_box, dice_box};
-  for (int i = 0; i < boxes.length; i++) {
-    boxes[i].show();
+  for (UIBox box : active_boxes) {
+    box.show();
   }
 }
 
