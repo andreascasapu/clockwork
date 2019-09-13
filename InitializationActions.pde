@@ -1,23 +1,53 @@
-private void create_player_trays(int num_rows) {
+private DiceTray[] create_trays(UIBox box, int num_trays, int num_rows, boolean enable) {
   int tray_id = 0;
-  int current_num = num_player_trays / num_rows;
+  int current_num = int(num_trays / num_rows);
   
   float modifier = 2f / 3;
-  float tray_side = min(dice_box.get_height() * 1f / num_rows * modifier, dice_box.get_width() * 1f / (current_num + num_player_trays % current_num) * modifier);
-  
-  float box_height = dice_box.get_height() * 1f / num_rows;
+  float tray_side = min(box.get_height() * 1f / num_rows * modifier, box.get_width() * 1f / (current_num + num_trays % current_num) * modifier);
+  DiceTray[] result = new DiceTray[num_trays];
+  float box_height = box.get_height() * 1f / num_rows;
   for (int i = 0; i < num_rows; i++) {
     if (i == num_rows - 1) {
-      current_num += num_player_trays % num_rows;
+      current_num += num_trays % num_rows;
     }
-    float box_width = dice_box.get_width() * 1f / current_num;
+    float box_width = box.get_width() * 1f / current_num;
     for (int j = 0; j < current_num; j++) {
-      Position curr_pos = new Position(dice_box.get_x() + box_width / 2f + j * box_width - 1f / 2 * tray_side, dice_box.get_y() + box_height / 2f + i * box_height - 1f / 2 * tray_side);
-      player_trays[tray_id] = new DiceTray(curr_pos, tray_side, true, color(255));
-      active_trays.add(player_trays[tray_id]);
+      Position curr_pos = new Position(box.get_x() + box_width / 2f + j * box_width - 1f / 2 * tray_side, box.get_y() + box_height / 2f + i * box_height - 1f / 2 * tray_side);
+      result[tray_id] = new DiceTray(curr_pos, tray_side, true, color(255));
+      if (enable) {
+        active_trays.add(result[tray_id]);
+      }
       tray_id++;
     }
   }
+  return result;
+}
+
+private DiceTray[] create_trays(UIBox box, int num_trays, int num_rows, boolean enable, float tray_side) {
+  int tray_id = 0;
+  int current_num = int(num_trays / num_rows);
+  
+  DiceTray[] result = new DiceTray[num_trays];
+  float box_height = box.get_height() * 1f / num_rows;
+  for (int i = 0; i < num_rows; i++) {
+    if (i == num_rows - 1) {
+      current_num += num_trays % num_rows;
+    }
+    float box_width = box.get_width() * 1f / current_num;
+    for (int j = 0; j < current_num; j++) {
+      Position curr_pos = new Position(box.get_x() + box_width / 2f + j * box_width - 1f / 2 * tray_side, box.get_y() + box_height / 2f + i * box_height - 1f / 2 * tray_side);
+      result[tray_id] = new DiceTray(curr_pos, tray_side, true, color(255));
+      if (enable) {
+        active_trays.add(result[tray_id]);
+      }
+      tray_id++;
+    }
+  }
+  return result;
+}
+
+private void create_player_trays(int num_rows) {
+  player_trays = create_trays(dice_box, num_player_trays, num_rows, true);
 }
 
 private int[] generate_stat_array(int num, float avg, int min, int max, float treshold) {

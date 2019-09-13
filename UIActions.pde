@@ -162,4 +162,5 @@ private void cleanup_elements() {
   cleanup_set_from(cleanup_buttons, active_buttons);
   cleanup_set_from(cleanup_scenes, active_scenes);
   cleanup_set_from(cleanup_trays, active_trays);
+  cleanup_set_from(cleanup_boxes, active_boxes);
 }

@@ -4,15 +4,15 @@ public class Button extends UIBox{
   String text;
   boolean is_pressed;
   
-  public Button(Position new_corner, float new_wh, float new_ht, Runnable new_to_run, color new_col) {
-    super(new Position(new_corner.get_x() - new_wh / 2, new_corner.get_y() - new_ht / 2), new_wh, new_ht, new_col);
+  public Button(Position new_centre, float new_wh, float new_ht, Runnable new_to_run, color new_col) {
+    super(new Position(new_centre.get_x() - new_wh / 2, new_centre.get_y() - new_ht / 2), new_wh, new_ht, new_col);
     to_run = new_to_run;
     text = "";
     is_pressed = false;
   }
   
-  public Button(Position new_pos, float new_wh, float new_ht, Runnable new_to_run, color new_col, String new_text) {
-    this(new_pos, new_wh, new_ht, new_to_run, new_col);
+  public Button(Position new_centre, float new_wh, float new_ht, Runnable new_to_run, color new_col, String new_text) {
+    this(new_centre, new_wh, new_ht, new_to_run, new_col);
     text = new_text;
   }
   

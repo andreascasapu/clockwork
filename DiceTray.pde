@@ -57,9 +57,11 @@ public class DiceTray extends Square{
   }
   
   public void roll(int type) {
-    assert(!has_dice());
+    if (has_dice()) {
+      dice.cleanup();
+    }
     Dice new_dice = new Dice(this, type);
-    dice = new_dice;
+    set_dice(new_dice);
   }
   
   protected boolean fillable_by(Dice new_dice) {

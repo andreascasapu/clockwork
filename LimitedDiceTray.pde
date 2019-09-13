@@ -15,6 +15,10 @@ public class LimitedDiceTray extends DiceTray {
     type = new_type;
   }
   
+  public LimitedDiceTray(DiceTray original_tray, int new_limit, int new_type) {
+    this(original_tray.get_corner(), original_tray.get_side(), original_tray.is_locked(), new_limit, new_type);
+  }
+  
   public int get_limit() {
     return limit;
   }

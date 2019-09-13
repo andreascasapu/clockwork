@@ -47,6 +47,7 @@ public class Dice extends Square{
   
   public void cleanup() {
     cleanup_dice.add(this);
+    get_tray().set_dice(null);
   }
   
   public int get_type() {
