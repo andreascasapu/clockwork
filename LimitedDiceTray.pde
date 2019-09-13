@@ -15,42 +15,16 @@ public class LimitedDiceTray extends DiceTray {
     type = new_type;
   }
   
-  @Override
-  public boolean add_dice(Dice new_dice) {
-    if (!has_dice() && !is_locked() && new_dice.get_type() == get_type() && new_dice.value >= limit) {
-      dice = new_dice;
-      dice.get_tray().clear_tray();
-      dice.set_tray(this);
-      return true;
-    }
-    return false;
-  }
-  
-  @Override
-  public boolean swap_dice(Dice new_dice) {
-    assert(new_dice != null);
-    if (!is_locked() && new_dice.get_type() == get_type() && new_dice.value >= limit) {
-      new_dice.get_tray().set_dice(dice);
-      if (has_dice()) {
-        dice.set_tray(new_dice.get_tray());
-      }
-      new_dice.set_tray(this);
-      dice = new_dice;
-      return true;
-    }
-    return false;
-  }
-  
-  @Override
-  public boolean is_fillable() {
-    return super.is_fillable() && held_dice.get_value() >= limit;
-  }
-  
   public int get_limit() {
     return limit;
   }
   
   public int get_type() {
     return type;
+  }
+  
+  @Override
+  protected boolean fillable_by(Dice new_dice) {
+    return !is_locked() && (new_dice == null || (new_dice.get_value() >= get_limit() && new_dice.get_type() == get_type()));
   }
 }

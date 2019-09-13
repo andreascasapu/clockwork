@@ -31,31 +31,6 @@ public class DiceTray extends Square{
     return dice.get_value();
   }
   
-  public boolean add_dice(Dice new_dice) {
-    assert(new_dice != null);
-    if (!is_locked() && !has_dice()) {
-      dice = new_dice;
-      dice.get_tray().clear_tray();
-      dice.set_tray(this);
-      return true;
-    }
-    return false;
-  }
-  
-  public boolean swap_dice(Dice new_dice) {
-    assert(new_dice != null);
-    if (!is_locked()) {
-      new_dice.get_tray().set_dice(dice);
-      if (has_dice()) {
-        dice.set_tray(new_dice.get_tray());
-      }
-      new_dice.set_tray(this);
-      dice = new_dice;
-      return true;
-    }
-    return false;
-  }
-  
   public void clear_tray() {
     dice = null;
   }
@@ -87,8 +62,25 @@ public class DiceTray extends Square{
     dice = new_dice;
   }
   
-  public boolean is_fillable() {
-    return !is_locked() && is_touched() && (held_dice != null);
+  protected boolean fillable_by(Dice new_dice) {
+    return !is_locked();
+  }
+  
+  public boolean is_swappable(DiceTray other_tray) {
+    return fillable_by(other_tray.get_dice()) && other_tray.fillable_by(get_dice());
+  }
+  
+  public void swap_dice(DiceTray other_tray) {
+    assert(is_swappable(other_tray));
+    Dice other_dice = other_tray.get_dice();
+    other_tray.set_dice(get_dice());
+    if (has_dice()) {
+      get_dice().set_tray(other_tray);
+    }
+    if (other_dice != null) {
+      other_dice.set_tray(this);
+    }
+    set_dice(other_dice);
   }
   
   public void cleanup() {

@@ -78,7 +78,7 @@ private void draw_dice_trays() {
     color col = tray.get_color();
     if (tray.is_locked()) {
       tray.show(color(red(col) * 0.2, green(col) * 0.2, blue(col) * 0.2));
-    } else if (tray.is_fillable()) {
+    } else if (held_dice != null && tray.is_swappable(held_dice.get_tray()) && tray.is_touched()) {
       tray.show(color(red(col) * 0.6, green(col) * 0.6, blue(col) * 0.6));
     } else {
       tray.show();
@@ -96,7 +96,7 @@ private void print_dice(Dice dice) {
   color col = dice.get_color();
   if (dice == held_dice) {
     dice.show(color(red(col) * 0.9, green(col) * 0.9, blue(col) * 0.9));
-  } else if (dice.get_tray().is_fillable()) {
+  } else if (held_dice != null && dice.get_tray().is_swappable(held_dice.get_tray()) && dice.get_tray().is_touched()) {
     dice.show(color(red(col) * 0.7, green(col) * 0.7, blue(col) * 0.7));
   } else {
     dice.show();
