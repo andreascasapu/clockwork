@@ -50,32 +50,32 @@ private void create_player_trays(int num_rows) {
   player_trays = create_trays(dice_box, num_player_trays, num_rows, true);
 }
 
-private int[] generate_stat_array(int num, float avg, int min, int max, float treshold) {
-  float pts = num * avg;
-  int[] array = new int[num];
-  for (int i = 0; i < num; i++) {
-    float best_avg = pts / (num - i);
-    int mi = -100;
-    int ma = -100;
-    for (int j = min; j <= max; j++) {
-      for (int k = j; k <= max; k++) {
-        if (abs(best_avg - ((ma + mi) / 2f)) > abs(best_avg - ((k + j) / 2f))) {
-          ma = k;
-          mi = j;
-        }
-      }
-    }
-    int next_val;
-    if (abs(avg - best_avg) / avg >= treshold) {
-      next_val = int(random(mi, ma + 1));
-    } else {
-      next_val = int(random(min, max + 1));
-    }
-    
-    pts -= next_val;
+private int[] generate_values_array(int num_elems, int pts, float pts_deviation, float allowed_deviation) {
+  assert(pts_deviation >= 0 && pts_deviation <= 1);
+  int[] array = new int[num_elems];
+  int[] order = new int[num_elems];
+  float virtual_pts = random(1 - pts_deviation, 1 + pts_deviation) * pts;
+  for (int i = 0; i < num_elems; i++) {
+    order[i] = i;
+    float avg = 1f * virtual_pts / (num_elems - i);
+    float min = max(0, (1 - allowed_deviation) * avg);
+    float max = (1 + allowed_deviation) * avg;
+    float f_val = random(min, max);
+    int next_val = int(round(f_val));
+    virtual_pts += f_val - next_val;
     array[i] = next_val;
+    virtual_pts -= next_val;
   }
-  return array;
+  for (int i = 0; i < num_elems; i++) {
+    int swap_pos = int(random(i, num_elems));
+    int temp = order[i];
+    order[i] = order[swap_pos];
+    order[swap_pos] = temp;
+  }
+  for (int i = 0; i < num_elems; i++) {
+    order[i] = array[order[i]];
+  }
+  return order;
 }
 
 private void create_UI_boxes() {
@@ -89,16 +89,7 @@ private void create_UI_boxes() {
   active_boxes.add(dice_box);
 }
 
-private void create_scenes() {
-  float desired_average = 2.75;
-  int[] stat_array = generate_stat_array(4, desired_average, 1, 4, 0.07);
-  int sum = 0;
-  for (int i = 0; i < 4; i++) {
-    sum += stat_array[i];
-  }
-  int health = 10 + 2 * int(4 * desired_average - sum);
-  player_stats = new Stats(stat_array[0], stat_array[1], stat_array[2], stat_array[3], health);
-  
+private void update_stats_scene() {
   TextBox[][] boxes = new TextBox[stat_names.length][2];
   for (int i = 0; i < stat_names.length; i++) {
     boxes[i][0]= new TextBox(new Position(0, height * 2f / 3 + i * height / 3f / stat_names.length), width / 6f, height / 3f / stat_names.length, stat_names[i], stat_cols[i]);
@@ -106,6 +97,18 @@ private void create_scenes() {
   }
   stats_scene = new Scene(boxes);
   active_scenes.add(stats_scene);
+}
+
+private void create_scenes() {
+  int[] stat_array = generate_values_array(4, 12, 0, 0.2);
+  int sum = 0;
+  for (int i = 0; i < 4; i++) {
+    sum += stat_array[i];
+  }
+  int health = 10 + 2 * (12 - sum);
+  player_stats = new Stats(stat_array[0], stat_array[1], stat_array[2], stat_array[3], health);
+  
+  update_stats_scene();
 }
 
 private void unlock_trays(int num) {

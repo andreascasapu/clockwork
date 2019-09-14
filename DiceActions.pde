@@ -32,3 +32,12 @@ private void move_dice() {
     held_dice.set_center(mouse_pos);
   }
 }
+
+private void player_roll(int type) {
+  assert(type >= 0 && type <= 3);
+  int num_rolling_trays = min(player_stats.get_stat(type), num_unlocked_player_trays);
+  for (int i = 0; i < num_rolling_trays; i++) {
+    player_trays[i].roll(type);
+    active_dice.add(player_trays[i].get_dice());
+  }
+}

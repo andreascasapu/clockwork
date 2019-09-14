@@ -87,8 +87,17 @@ private void draw_dice_trays() {
       float horizontal_scalar = 2f / 3;
       float vertical_scalar = 2f / 3;
       print_text_in_box(Integer.toString(((LimitedDiceTray) tray).get_limit()), cp_gothic, color(255), leading_scalar, tray, horizontal_scalar, vertical_scalar);
+      StringBuilder punishment_text_builder = new StringBuilder();
+      for (int i = 0; i < 5; i++) {
+        punishment_text_builder.append(((LimitedDiceTray) tray).get_punishment().get_stat(i));
+        if (i != 4) {
+          punishment_text_builder.append(' ');
+        }
+      }
+      print_text_in_box(punishment_text_builder.toString(), cp_gothic, color(255), leading_scalar, new UIBox(new Position(tray.get_x() - tray.get_side() / 2f, tray.get_y() + tray.get_side()), 2 * tray.get_side(), tray.get_side() / 2f, color(255)), horizontal_scalar, vertical_scalar);
     }
   }
+  
 }
 
 private void print_dice(Dice dice) {
@@ -140,7 +149,8 @@ private void draw_scenes() {
   float leading_scalar = 5f / 3;
   float horizontal_scalar = 2f / 3;
   float vertical_scalar = 1f;
-  
+  stats_scene.cleanup();
+  update_stats_scene();
   for (Scene scene : active_scenes) {
     TextBox[] boxes = scene.get_text_boxes();
     float min_size = find_minimum_font_size_in_group(boxes, leading_scalar, horizontal_scalar, vertical_scalar);

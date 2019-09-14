@@ -36,7 +36,9 @@ public class DiceTray extends Square{
   }
   
   public void delete_dice() {
-    active_dice.remove(dice);
+    if (has_dice()) {
+      dice.cleanup();
+    }
     clear_tray();
   }
   
