@@ -46,7 +46,7 @@ private void player_roll(int type) {
 
 // INITIALIZATON UTILITIES
 
-private DiceTray[] create_trays(UIBox box, int num_trays, int num_rows, boolean enable) {
+private DiceTray[] create_trays(Box box, int num_trays, int num_rows, boolean enable) {
   int tray_id = 0;
   int current_num = int(num_trays / num_rows);
   
@@ -71,7 +71,7 @@ private DiceTray[] create_trays(UIBox box, int num_trays, int num_rows, boolean 
   return result;
 }
 
-private DiceTray[] create_trays(UIBox box, int num_trays, int num_rows, boolean enable, float tray_side) {
+private DiceTray[] create_trays(Box box, int num_trays, int num_rows, boolean enable, float tray_side) {
   int tray_id = 0;
   int current_num = int(num_trays / num_rows);
   
@@ -128,13 +128,13 @@ private int[] generate_values_array(int num_elems, int pts, float pts_deviation,
 
 private void create_UI_boxes() {
   info_box = new UIBox(new Position(0, 0), width, height * 1f / 9, color(184, 124, 51));
-  active_boxes.add(info_box);
+  active_ui_boxes.add(info_box);
   action_box = new UIBox(new Position(0, height * 1f / 9), width, height * 5f / 9, color(184, 115, 51));
-  active_boxes.add(action_box);
+  active_ui_boxes.add(action_box);
   stat_box = new UIBox(new Position(0, height * 2f / 3), width * 1f / 3, height * 1f / 3, color(190, 115, 51));
-  active_boxes.add(stat_box);
+  active_ui_boxes.add(stat_box);
   dice_box = new UIBox(new Position(width * 1f / 3, height * 2f / 3), width * 2f / 3, height * 1f / 3, color(184, 115, 60));
-  active_boxes.add(dice_box);
+  active_ui_boxes.add(dice_box);
 }
 
 private void update_stats_scene() {
@@ -147,7 +147,7 @@ private void update_stats_scene() {
   active_scenes.add(stats_scene);
 }
 
-private void create_scenes() {
+private void create_player_stats() {
   int[] stat_array = generate_values_array(4, 12, 0, 0.2);
   int sum = 0;
   for (int i = 0; i < 4; i++) {
@@ -155,19 +155,11 @@ private void create_scenes() {
   }
   int health = 10 + 2 * (12 - sum);
   player_stats = new Stats(stat_array[0], stat_array[1], stat_array[2], stat_array[3], health);
-  
-  update_stats_scene();
-}
-
-private void unlock_trays(int num) {
-  for (int i = 0; i < num; i++) {
-    player_trays[i].unlock();
-  }
 }
 
 // UI UTILITIES
 
-private boolean fits_in_box(String text, float text_size, float text_leading, UIBox box) {
+private boolean fits_in_box(String text, float text_size, float text_leading, Box box) {
   textSize(text_size);
   int lines = 1;
   for (int i = 0; i < text.length(); i++) {
@@ -184,7 +176,7 @@ private boolean fits_in_box(String text, float text_size, float text_leading, UI
   return (textWidth(text) <= box.get_width()) && (lines * text_size + (lines - 1) * max(0, text_leading - 2f / 3 * text_size) <= box.get_height());
 }
 
-private float find_font_size(UIBox text_box, String text, float leading_scalar) {
+private float find_font_size(Box text_box, String text, float leading_scalar) {
   int index = 1 << 20;
   float modifier = 1f / 10000;
   float font_size = 0;
@@ -201,7 +193,7 @@ private void print_text_in_box(String text, PFont font, color col, Box box, floa
   float new_width = box.get_width() * horizontal_scalar;
   float new_height = box.get_height() * vertical_scalar;
   Position new_corner = new Position(box.get_corner().get_x() + (box.get_width() - new_width) / 2f, box.get_corner().get_y() + (box.get_height() - new_height) / 2f);
-  UIBox print_box = new UIBox(new_corner, new_width, new_height, color(0));
+  Box print_box = new Box(new_corner, new_width, new_height);
   float font_size = find_font_size(print_box, text, leading_scalar);
   textFont(font, font_size);
   textLeading(font_size * leading_scalar);
@@ -213,7 +205,7 @@ private void print_text_in_box(float font_size, String text, PFont font, color c
   float new_width = box.get_width() * horizontal_scalar;
   float new_height = box.get_height() * vertical_scalar;
   Position new_corner = new Position(box.get_corner().get_x() + (box.get_width() - new_width) / 2f, box.get_corner().get_y() + (box.get_height() - new_height) / 2f);
-  UIBox print_box = new UIBox(new_corner, new_width, new_height, color(0));
+  Box print_box = new Box(new_corner, new_width, new_height);
   textFont(font, font_size);
   textLeading(font_size * leading_scalar);
   fill(col);
@@ -226,7 +218,7 @@ private float find_minimum_font_size_in_group(TextBox[] boxes, float leading_sca
     float new_width = boxes[i].get_width() * horizontal_scalar;
     float new_height = boxes[i].get_height() * vertical_scalar;
     Position new_corner = new Position(boxes[i].get_corner().get_x() + (boxes[i].get_width() - new_width) / 2f, (boxes[i].get_height() - new_height) / 2f);
-    UIBox new_box = new UIBox(new_corner, new_width, new_height, color(0));
+    Box new_box = new Box(new_corner, new_width, new_height);
     float font_size = find_font_size(new_box, boxes[i].get_text(), leading_scalar);
     if (font_size < min_size) {
       min_size = font_size;
@@ -234,101 +226,7 @@ private float find_minimum_font_size_in_group(TextBox[] boxes, float leading_sca
   }
   return min_size;
 }
-/*
-private void draw_layout() {
-  for (UIBox box : active_boxes) {
-    box.show();
-  }
-}
 
-private void draw_dice_trays() {
-  for (DiceTray tray : active_trays) {
-    color col = tray.get_color();
-    if (tray.is_locked()) {
-      tray.show(color(red(col) * 0.2, green(col) * 0.2, blue(col) * 0.2));
-    } else if (held_dice != null && tray.is_swappable(held_dice.get_tray()) && tray.is_touched()) {
-      tray.show(color(red(col) * 0.6, green(col) * 0.6, blue(col) * 0.6));
-    } else {
-      tray.show();
-    }
-    if (tray instanceof LimitedDiceTray) {
-      float leading_scalar = 5f / 3;
-      float horizontal_scalar = 2f / 3;
-      float vertical_scalar = 2f / 3;
-      print_text_in_box(Integer.toString(((LimitedDiceTray) tray).get_limit()), cp_gothic, color(255), leading_scalar, tray, horizontal_scalar, vertical_scalar);
-      StringBuilder punishment_text_builder = new StringBuilder();
-      for (int i = 0; i < 5; i++) {
-        punishment_text_builder.append(((LimitedDiceTray) tray).get_punishment().get_stat(i));
-        if (i != 4) {
-          punishment_text_builder.append(' ');
-        }
-      }
-      print_text_in_box(punishment_text_builder.toString(), cp_gothic, color(255), leading_scalar, new UIBox(new Position(tray.get_corner().get_x() - tray.get_side() / 2f, tray.get_corner().get_y() + tray.get_side()), 2 * tray.get_side(), tray.get_side() / 2f, color(255)), horizontal_scalar, vertical_scalar);
-    }
-  }
-  
-}
-
-private void print_dice(Dice dice) {
-  color col = dice.get_color();
-  if (dice == held_dice) {
-    dice.show(color(red(col) * 0.9, green(col) * 0.9, blue(col) * 0.9));
-  } else if (held_dice != null && dice.get_tray().is_swappable(held_dice.get_tray()) && dice.get_tray().is_touched()) {
-    dice.show(color(red(col) * 0.7, green(col) * 0.7, blue(col) * 0.7));
-  } else {
-    dice.show();
-  }
-  
-  float leading_scalar = 5f / 3;
-  float horizontal_scalar = 2f / 3;
-  float vertical_scalar = 2f / 3;
-  print_text_in_box(Integer.toString(dice.get_value()), cp_gothic, color(0), leading_scalar, dice, horizontal_scalar, vertical_scalar);
-}
-
-private void draw_dice() {
-  textFont(cp_gothic);
-  
-  for (Dice dice : active_dice) {
-    print_dice(dice);
-  }
-  
-  if (held_dice != null) {
-    print_dice(held_dice);
-  }
-}
-
-private void draw_buttons() {
-  textFont(cp_gothic);
-  for (Button button : active_buttons) {
-    if (button.is_pressed()) {
-      color col = button.get_color();
-      button.show(color(red(col) * 1f / 3, green(col) * 1f / 3, blue(col) * 1f / 3));
-    } else {
-      button.show();
-    }
-    
-    float leading_scalar = 5f / 3;
-    float horizontal_scalar = 2f / 3;
-    float vertical_scalar = 2f / 3;
-    print_text_in_box(button.get_text(), cp_gothic, color(255), leading_scalar, button, horizontal_scalar, vertical_scalar);
-  }
-}
-
-private void draw_scenes() {
-  float leading_scalar = 5f / 3;
-  float horizontal_scalar = 2f / 3;
-  float vertical_scalar = 1f;
-  stats_scene.cleanup();
-  update_stats_scene();
-  for (Scene scene : active_scenes) {
-    TextBox[] boxes = scene.get_text_boxes();
-    float min_size = find_minimum_font_size_in_group(boxes, leading_scalar, horizontal_scalar, vertical_scalar);
-    for (TextBox box : boxes) {
-      print_text_in_box(min_size, box.get_text(), cp_gothic, box.get_text_color(), leading_scalar, box, horizontal_scalar, vertical_scalar);
-    }
-  }
-}
-*/
 private void cleanup_set_from(Set<?> to_remove, Set<?> from) {
   for (Object obj : to_remove) {
     from.remove(obj);
@@ -341,7 +239,7 @@ private void cleanup_elements() {
   cleanup_set_from(cleanup_buttons, active_buttons);
   cleanup_set_from(cleanup_scenes, active_scenes);
   cleanup_set_from(cleanup_trays, active_trays);
-  cleanup_set_from(cleanup_boxes, active_boxes);
+  cleanup_set_from(cleanup_ui_boxes, active_ui_boxes);
 }
 
 // BUTTON UTILITIES
@@ -383,7 +281,7 @@ private void make_encounter() {
   }
   punish_pts = max(num_trays, int(random(punish_pts / 6 + 1)));
   int[] tray_punishment_allocation = generate_values_array(num_trays, punish_pts, 0, 0.1);
-  DiceTray[] base_trays = create_trays(new UIBox(action_box.get_corner(), action_box.get_width() / 2f, action_box.get_height(), color(0)), num_trays, max(1, int(num_trays / 3)), false, player_trays[0].get_side());
+  DiceTray[] base_trays = create_trays(new Box(action_box.get_corner(), action_box.get_width() / 2f, action_box.get_height()), num_trays, max(1, int(num_trays / 3)), false, player_trays[0].get_side());
   for (int i = 0; i < num_trays; i++) {
     encounter_trays[i] = new LimitedDiceTray(base_trays[i], int(random(1, 7)), type, new Stats(generate_values_array(stat_names.length, tray_punishment_allocation[i], 0, 0.1)));
     encounter_trays[i].get_punishment().set_stat(4, encounter_trays[i].get_punishment().get_stat(4) * 2);

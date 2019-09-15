@@ -15,8 +15,8 @@ private Set<Scene> active_scenes = new HashSet();
 private Set<Scene> cleanup_scenes = new HashSet();
 private Set<DiceTray> active_trays = new HashSet();
 private Set<DiceTray> cleanup_trays = new HashSet();
-private Set<UIBox> active_boxes = new HashSet();
-private Set<UIBox> cleanup_boxes = new HashSet();
+private Set<UIBox> active_ui_boxes = new HashSet();
+private Set<UIBox> cleanup_ui_boxes = new HashSet();
 
 private String[] stat_names = {"BODY", "WITS", "CRAFT", "LUCK", "HEALTH"};
 private color stat_cols[] = {color(60, 120, 180), color(110, 50, 150), color(160, 40, 40), color(100, 170, 80), color(255)};
@@ -38,18 +38,22 @@ void setup() {
   
   create_UI_boxes();
   
-  create_scenes();
+  create_player_stats();
+  update_stats_scene();
   
   final int num_rows = 2;
   create_player_trays(num_rows);
   
-  unlock_trays(3);
+  // TESTING PURPOSES
+  for (int i = 0; i < 3; i++) {
+    player_trays[i].unlock();
+  }
   make_encounter();
 }
 
 void draw() {
   List<Set<? extends Showable>> showables = new ArrayList<Set<? extends Showable>>();
-  showables.add(active_boxes);
+  showables.add(active_ui_boxes);
   showables.add(active_scenes);
   showables.add(active_trays);
   showables.add(active_buttons);
