@@ -74,7 +74,7 @@ private void make_encounter() {
     encounter_trays[i].unlock();
     active_trays.add(encounter_trays[i]);
   }
-  final Button encounter_button = new Button(new Position(action_box.get_x() + action_box.get_width() * 3f / 4, action_box.get_y() + action_box.get_height() / 2f), action_box.get_width() / 10f, action_box.get_height() / 4f, null, color(50, 200, 50), "DONE");
+  final Button encounter_button = new Button(new Position(action_box.get_corner().get_x() + action_box.get_width() * 3f / 4, action_box.get_corner().get_y() + action_box.get_height() / 2f), action_box.get_width() / 10f, action_box.get_height() / 4f, null, color(50, 200, 50), "DONE");
   final Button[] encounter_buttons = {encounter_button};
   active_buttons.add(encounter_button);
   final Scene encounter = new Scene(new TextBox[0], encounter_trays, encounter_buttons);
