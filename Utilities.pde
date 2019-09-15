@@ -189,7 +189,7 @@ private void print_text_in_box(String text, PFont font, color col, Box box, floa
   text(text, print_box.get_corner().get_x() + print_box.get_width() / 2f, print_box.get_corner().get_y() + print_box.get_height() / 2f);
 }
 
-private void print_text_in_box(float font_size, String text, PFont font, color col, float leading_scalar, Box box, float horizontal_scalar, float vertical_scalar) {
+private void print_text_in_box(float font_size, String text, PFont font, color col, Box box, float leading_scalar, float horizontal_scalar, float vertical_scalar) {
   float new_width = box.get_width() * horizontal_scalar;
   float new_height = box.get_height() * vertical_scalar;
   Position new_corner = new Position(box.get_corner().get_x() + (box.get_width() - new_width) / 2f, box.get_corner().get_y() + (box.get_height() - new_height) / 2f);
@@ -263,12 +263,12 @@ private void make_encounter() {
   int type = int(random(0, 4));
   int num_trays = min(int(random(player_stats.get_stat(type) == 0 ? 0 : 1, player_stats.get_stat(type) + 1)), num_unlocked_player_trays);
   final LimitedDiceTray[] encounter_trays = new LimitedDiceTray[num_trays];
+  int punish_pts = 0;
+  for (int i = 0; i < 5; i++) {
+    punish_pts += (i == 4 ? 1 : 2) * player_stats.get_stat(i);
+  }
+  punish_pts = max(num_trays, int(random(punish_pts / 6 + 1)));
   if (num_trays > 0) {
-    int punish_pts = 0;
-    for (int i = 0; i < 5; i++) {
-      punish_pts += (i == 4 ? 1 : 2) * player_stats.get_stat(i);
-    }
-    punish_pts = max(num_trays, int(random(punish_pts / 6 + 1)));
     int[] tray_punishment_allocation = generate_values_array(num_trays, punish_pts, 0, 0.1);
     DiceTray[] base_trays = create_trays(new Box(action_box.get_corner(), action_box.get_width() / 2f, action_box.get_height()), num_trays, max(1, int(num_trays / 3)), false, player_trays[0].get_side());
     for (int i = 0; i < num_trays; i++) {
@@ -281,17 +281,18 @@ private void make_encounter() {
   final Button encounter_button = new Button(new Position(action_box.get_corner().get_x() + action_box.get_width() * 3f / 4, action_box.get_corner().get_y() + action_box.get_height() / 2f), action_box.get_width() / 10f, action_box.get_height() / 4f, null, color(50, 200, 50), "DONE");
   final Button[] encounter_buttons = {encounter_button};
   active_buttons.add(encounter_button);
-  final Scene encounter = new Scene(new TextBox[0], encounter_trays, encounter_buttons);
+  final Scene encounter = new Scene(new TextBox[0], encounter_trays, encounter_buttons, new Stats(generate_values_array(stat_names.length, punish_pts, 0, 0.1)));
   active_scenes.add(encounter);
   encounter_button.set_to_run(new Runnable(){public void run(){
   for (LimitedDiceTray tray : encounter_trays) {
     if (!tray.has_dice()) {
-      tray.punish_player();
+      tray.get_punishment().apply_to_player(-1);
     }
   }
   for (int i = 0; i < num_player_trays; i++) {
     player_trays[i].delete_dice();
   }
+  encounter.get_reward().apply_to_player(1);
   encounter.cleanup();
   make_encounter();
   }});

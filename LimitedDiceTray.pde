@@ -40,12 +40,6 @@ public class LimitedDiceTray extends DiceTray {
     return !is_locked() && (new_dice == null || (new_dice.get_value() >= get_limit() && new_dice.get_type() == get_type()));
   }
   
-  public void punish_player() {
-    for (int i = 0; i < 5; i++) {
-      player_stats.set_stat(i, max(0, player_stats.get_stat(i) - punishment.get_stat(i)));
-    }
-  }
-  
   @Override
   public void show() {
     super.show();

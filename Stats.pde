@@ -77,4 +77,10 @@ public class Stats {
         break;
     }
   }
+  
+  public void apply_to_player(int sign) {
+    for (int i = 0; i < 5; i++) {
+      player_stats.set_stat(i, max(0, player_stats.get_stat(i) + sign * get_stat(i)));
+    }
+  }
 }

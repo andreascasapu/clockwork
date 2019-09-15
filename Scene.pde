@@ -3,6 +3,7 @@ public class Scene implements Showable{
   private TextBox[] text_boxes;
   private DiceTray[] dice_trays;
   private Button[] buttons;
+  Stats reward;
   
   public Scene(TextBox[] new_text_boxes) {
     text_boxes = new_text_boxes;
@@ -24,10 +25,11 @@ public class Scene implements Showable{
     buttons = null;
   }
   
-  public Scene(TextBox[] new_text_boxes, DiceTray[] new_dice_trays, Button[] new_buttons) {
+  public Scene(TextBox[] new_text_boxes, DiceTray[] new_dice_trays, Button[] new_buttons, Stats new_reward) {
     this(new_text_boxes);
     dice_trays = new_dice_trays;
     buttons = new_buttons;
+    reward = new_reward;
   }
   
   public TextBox[] get_text_boxes() {
@@ -40,6 +42,10 @@ public class Scene implements Showable{
   
   public Button[] get_buttons() {
     return buttons;
+  }
+  
+  public Stats get_reward() {
+    return reward;
   }
   
   public void cleanup() {
@@ -62,7 +68,17 @@ public class Scene implements Showable{
     float vertical_scalar = 1f;
     float min_size = find_minimum_font_size_in_group(get_text_boxes(), leading_scalar, horizontal_scalar, vertical_scalar);
     for (TextBox box : get_text_boxes()) {
-      print_text_in_box(min_size, box.get_text(), cp_gothic, box.get_text_color(), leading_scalar, box, horizontal_scalar, vertical_scalar);
+      print_text_in_box(min_size, box.get_text(), cp_gothic, box.get_text_color(), box, leading_scalar, horizontal_scalar, vertical_scalar);
+    }
+    if (reward != null) {
+      StringBuilder reward_text_builder = new StringBuilder();
+      for (int i = 0; i < 5; i++) {
+        reward_text_builder.append(reward.get_stat(i));
+        if (i != 4) {
+          reward_text_builder.append(' ');
+        }
+      }
+      print_text_in_box(reward_text_builder.toString(), cp_gothic, color(0), info_box, leading_scalar, horizontal_scalar, vertical_scalar);
     }
   }
 }
