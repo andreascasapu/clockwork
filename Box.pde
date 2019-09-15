@@ -1,4 +1,4 @@
-public abstract class Box {
+public class Box {
   
   private Position corner;
   private float wh;

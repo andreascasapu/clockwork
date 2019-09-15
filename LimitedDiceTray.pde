@@ -35,14 +35,32 @@ public class LimitedDiceTray extends DiceTray {
     return punishment;
   }
   
+  @Override
+  protected boolean fillable_by(Dice new_dice) {
+    return !is_locked() && (new_dice == null || (new_dice.get_value() >= get_limit() && new_dice.get_type() == get_type()));
+  }
+  
   public void punish_player() {
     for (int i = 0; i < 5; i++) {
-      player_stats.set_stat(i, player_stats.get_stat(i) - punishment.get_stat(i));
+      player_stats.set_stat(i, max(0, player_stats.get_stat(i) - punishment.get_stat(i)));
     }
   }
   
   @Override
-  protected boolean fillable_by(Dice new_dice) {
-    return !is_locked() && (new_dice == null || (new_dice.get_value() >= get_limit() && new_dice.get_type() == get_type()));
+  public void show() {
+    super.show();
+    float leading_scalar = 5f / 3;
+    float horizontal_scalar = 2f / 3;
+    float vertical_scalar = 2f / 3;
+    print_text_in_box(Integer.toString(get_limit()), cp_gothic, color(255), this, leading_scalar, horizontal_scalar, vertical_scalar);
+    StringBuilder punishment_text_builder = new StringBuilder();
+    for (int i = 0; i < 5; i++) {
+      punishment_text_builder.append(get_punishment().get_stat(i));
+      if (i != 4) {
+        punishment_text_builder.append(' ');
+      }
+    }
+    Box print_box = new Box(new Position(get_corner().get_x() - get_side() / 2f, get_corner().get_y() + get_side()), 2 * get_side(), get_side() / 2f);
+    print_text_in_box(punishment_text_builder.toString(), cp_gothic, color(255), print_box, leading_scalar, horizontal_scalar, vertical_scalar);
   }
 }

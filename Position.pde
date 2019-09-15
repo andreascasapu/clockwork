@@ -1,6 +1,6 @@
 public final class Position {
   
-  private float x, y;
+  private final float x, y;
   
   public Position(float new_x, float new_y) {
     x = new_x;

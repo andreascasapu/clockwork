@@ -197,7 +197,7 @@ private float find_font_size(UIBox text_box, String text, float leading_scalar) 
   return font_size;
 }
 
-private void print_text_in_box(String text, PFont font, color col, float leading_scalar, Box box, float horizontal_scalar, float vertical_scalar) {
+private void print_text_in_box(String text, PFont font, color col, Box box, float leading_scalar, float horizontal_scalar, float vertical_scalar) {
   float new_width = box.get_width() * horizontal_scalar;
   float new_height = box.get_height() * vertical_scalar;
   Position new_corner = new Position(box.get_corner().get_x() + (box.get_width() - new_width) / 2f, box.get_corner().get_y() + (box.get_height() - new_height) / 2f);
@@ -220,12 +220,6 @@ private void print_text_in_box(float font_size, String text, PFont font, color c
   text(text, print_box.get_corner().get_x() + print_box.get_width() / 2f, print_box.get_corner().get_y() + print_box.get_height() / 2f);
 }
 
-private void draw_layout() {
-  for (UIBox box : active_boxes) {
-    box.show();
-  }
-}
-
 private float find_minimum_font_size_in_group(TextBox[] boxes, float leading_scalar, float horizontal_scalar, float vertical_scalar) {
   float min_size = 1000000;
   for (int i = 0; i < boxes.length; i++) {
@@ -239,6 +233,12 @@ private float find_minimum_font_size_in_group(TextBox[] boxes, float leading_sca
     }
   }
   return min_size;
+}
+/*
+private void draw_layout() {
+  for (UIBox box : active_boxes) {
+    box.show();
+  }
 }
 
 private void draw_dice_trays() {
@@ -328,7 +328,7 @@ private void draw_scenes() {
     }
   }
 }
-
+*/
 private void cleanup_set_from(Set<?> to_remove, Set<?> from) {
   for (Object obj : to_remove) {
     from.remove(obj);
@@ -342,4 +342,70 @@ private void cleanup_elements() {
   cleanup_set_from(cleanup_scenes, active_scenes);
   cleanup_set_from(cleanup_trays, active_trays);
   cleanup_set_from(cleanup_boxes, active_boxes);
+}
+
+// BUTTON UTILITIES
+
+private void depress_button() {
+  for (Button button : active_buttons) {
+    if (button.is_touched()) {
+      button.set_pressed(true);
+    }
+  }
+}
+
+private void press_button() {
+  for (Button button : active_buttons) {
+    if (button.is_pressed()) {
+      button.set_pressed(false);
+      button.press();
+    }
+  }
+}
+
+private void cancel_button_press() {
+  for (Button button : active_buttons) {
+    if (button.is_pressed() && !button.is_touched()) {
+      button.set_pressed(false);
+    }
+  }
+}
+
+// SCENE UTILITIES
+
+private void make_encounter() {
+  int type = int(random(0, 4));
+  int num_trays = min(int(random(player_stats.get_stat(type) == 0 ? 0 : 1, player_stats.get_stat(type) + 1)), num_unlocked_player_trays);
+  final LimitedDiceTray[] encounter_trays = new LimitedDiceTray[num_trays];
+  int punish_pts = 0;
+  for (int i = 0; i < 5; i++) {
+    punish_pts += (i == 4 ? 1 : 2) * player_stats.get_stat(i);
+  }
+  punish_pts = max(num_trays, int(random(punish_pts / 6 + 1)));
+  int[] tray_punishment_allocation = generate_values_array(num_trays, punish_pts, 0, 0.1);
+  DiceTray[] base_trays = create_trays(new UIBox(action_box.get_corner(), action_box.get_width() / 2f, action_box.get_height(), color(0)), num_trays, max(1, int(num_trays / 3)), false, player_trays[0].get_side());
+  for (int i = 0; i < num_trays; i++) {
+    encounter_trays[i] = new LimitedDiceTray(base_trays[i], int(random(1, 7)), type, new Stats(generate_values_array(stat_names.length, tray_punishment_allocation[i], 0, 0.1)));
+    encounter_trays[i].get_punishment().set_stat(4, encounter_trays[i].get_punishment().get_stat(4) * 2);
+    encounter_trays[i].unlock();
+    active_trays.add(encounter_trays[i]);
+  }
+  final Button encounter_button = new Button(new Position(action_box.get_corner().get_x() + action_box.get_width() * 3f / 4, action_box.get_corner().get_y() + action_box.get_height() / 2f), action_box.get_width() / 10f, action_box.get_height() / 4f, null, color(50, 200, 50), "DONE");
+  final Button[] encounter_buttons = {encounter_button};
+  active_buttons.add(encounter_button);
+  final Scene encounter = new Scene(new TextBox[0], encounter_trays, encounter_buttons);
+  active_scenes.add(encounter);
+  encounter_button.set_to_run(new Runnable(){public void run(){
+  for (LimitedDiceTray tray : encounter_trays) {
+    if (!tray.has_dice()) {
+      tray.punish_player();
+    }
+  }
+  for (int i = 0; i < num_player_trays; i++) {
+    player_trays[i].delete_dice();
+  }
+  encounter.cleanup();
+  make_encounter();
+  }});
+  player_roll(type);
 }

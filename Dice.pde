@@ -1,8 +1,7 @@
-public class Dice extends Square{
+public class Dice extends UISquare{
   
   private int value;
   private DiceTray tray;
-  private boolean is_held;
   private int type;
   
   public Dice(DiceTray new_tray, int new_type) {
@@ -11,20 +10,11 @@ public class Dice extends Square{
     value = int(random(1, 7));
     tray = new_tray;
     type = new_type;
-    is_held = false;
   }
   
   public Dice(DiceTray new_tray, int new_type, int new_value) {
     this(new_tray, new_type);
     value = new_value;
-  }
-  
-  public boolean is_held() {
-    return is_held;
-  }
-  
-  public void set_held(boolean new_held) {
-    is_held = new_held;
   }
   
   public int get_value() {
@@ -45,12 +35,28 @@ public class Dice extends Square{
     return tray.get_side();
   }
   
+  public int get_type() {
+    return type;
+  }
+  
   public void cleanup() {
     cleanup_dice.add(this);
     get_tray().set_dice(null);
   }
   
-  public int get_type() {
-    return type;
+  @Override
+  public void show() {
+    if (this == held_dice) {
+      super.show(color(red(get_color()) * 0.9, green(get_color()) * 0.9, blue(get_color()) * 0.9));
+    } else if (held_dice != null && get_tray().is_swappable(held_dice.get_tray()) && get_tray().is_touched()) {
+      super.show(color(red(get_color()) * 0.7, green(get_color()) * 0.7, blue(get_color()) * 0.7));
+    } else {
+      super.show();
+    }
+    
+    float leading_scalar = 5f / 3;
+    float horizontal_scalar = 2f / 3;
+    float vertical_scalar = 2f / 3;
+    print_text_in_box(Integer.toString(get_value()), cp_gothic, color(0), this, leading_scalar, horizontal_scalar, vertical_scalar);
   }
 }

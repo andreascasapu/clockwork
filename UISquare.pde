@@ -1,6 +1,6 @@
-public class Square extends UIBox{
+public class UISquare extends UIBox{
   
-  public Square(Position new_corner, float new_side, color new_col) {
+  public UISquare(Position new_corner, float new_side, color new_col) {
     super(new_corner, new_side, new_side, new_col);
   }
   

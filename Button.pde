@@ -20,10 +20,6 @@ public class Button extends UIBox{
     return text;
   }
   
-  public void press() {
-    to_run.run();
-  }
-  
   public boolean is_pressed() {
     return is_pressed;
   }
@@ -36,7 +32,24 @@ public class Button extends UIBox{
     to_run = new_to_run;
   }
   
+  public void press() {
+    to_run.run();
+  }
+  
   public void cleanup() {
     cleanup_buttons.add(this);
+  }
+  
+  @Override
+  public void show() {
+    if (is_pressed()) {
+      super.show(color(red(get_color()) / 3f, green(get_color()) / 3f, blue(get_color()) / 3f));
+    } else {
+      super.show();
+    }
+    float leading_scalar = 5f / 3;
+    float horizontal_scalar = 2f / 3;
+    float vertical_scalar = 2f / 3;
+    print_text_in_box(get_text(), cp_gothic, color(255), this, leading_scalar, horizontal_scalar, vertical_scalar);
   }
 }

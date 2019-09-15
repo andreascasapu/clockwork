@@ -1,4 +1,4 @@
-public class UIBox extends Box{
+public class UIBox extends Box implements Showable{
   
   private color col;
   private float stroke_weight;

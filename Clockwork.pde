@@ -48,11 +48,27 @@ void setup() {
 }
 
 void draw() {
-  draw_layout();
+  List<Set<? extends Showable>> showables = new ArrayList<Set<? extends Showable>>();
+  showables.add(active_boxes);
+  showables.add(active_scenes);
+  showables.add(active_trays);
+  showables.add(active_buttons);
+  showables.add(active_dice);
+  /*draw_layout();
   draw_dice_trays();
   draw_buttons();
   draw_dice();
-  draw_scenes();
+  draw_scenes();*/
+  stats_scene.cleanup();
+  update_stats_scene();
+  for (int i = 0; i < showables.size(); i++) {
+    for (Showable showable : showables.get(i)) {
+      showable.show();
+    }
+  }
+  if (held_dice != null) {
+    held_dice.show();
+  }
   cleanup_elements();
 }
 

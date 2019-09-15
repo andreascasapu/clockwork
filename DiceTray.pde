@@ -1,4 +1,4 @@
-public class DiceTray extends Square{
+public class DiceTray extends UISquare{
   
   protected Dice dice;
   protected boolean is_locked;
@@ -23,27 +23,31 @@ public class DiceTray extends Square{
   }
   
   public boolean has_dice() {
-    return dice != null;
+    return get_dice() != null;
   }
   
   public int read_dice() {
     assert(has_dice());
-    return dice.get_value();
-  }
-  
-  public void clear_tray() {
-    dice = null;
-  }
-  
-  public void delete_dice() {
-    if (has_dice()) {
-      dice.cleanup();
-    }
-    clear_tray();
+    return get_dice().get_value();
   }
   
   public boolean is_locked() {
     return is_locked;
+  }
+  
+  public void clear_tray() {
+    set_dice(null);
+  }
+  
+  private void cleanup_dice() {
+    if (has_dice()) {
+      get_dice().cleanup();
+    }
+  }
+  
+  public void delete_dice() {
+    cleanup_dice();
+    clear_tray();
   }
   
   private void set_locked(boolean locked) {
@@ -59,11 +63,8 @@ public class DiceTray extends Square{
   }
   
   public void roll(int type) {
-    if (has_dice()) {
-      dice.cleanup();
-    }
-    Dice new_dice = new Dice(this, type);
-    set_dice(new_dice);
+    cleanup_dice();
+    set_dice(new Dice(this, type));
   }
   
   protected boolean fillable_by(Dice new_dice) {
@@ -88,9 +89,18 @@ public class DiceTray extends Square{
   }
   
   public void cleanup() {
-    if (has_dice()) {
-      dice.cleanup();
-    }
+    cleanup_dice();
     cleanup_trays.add(this);
+  }
+  
+  @Override
+  public void show() {
+    if (is_locked()) {
+      super.show(color(red(get_color()) * 0.2, green(get_color()) * 0.2, blue(get_color()) * 0.2));
+    } else if (held_dice != null && is_swappable(held_dice.get_tray()) && is_touched()) {
+      super.show(color(red(get_color()) * 0.6, green(get_color()) * 0.6, blue(get_color()) * 0.6));
+    } else {
+      super.show();
+    }
   }
 }
