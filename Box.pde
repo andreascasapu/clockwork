@@ -34,11 +34,11 @@ public class Box {
     corner = new_corner;
   }
   
-  public Position get_center() {
+  public Position get_centre() {
     return new Position(corner.get_x() + get_width() / 2, corner.get_y() + get_height() / 2);
   }
   
-  public void set_center(Position new_center) {
+  public void set_centre(Position new_center) {
     set_corner(new Position(new_center.get_x() - get_width() / 2, new_center.get_y() - get_height() / 2));
   }
   

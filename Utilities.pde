@@ -31,7 +31,7 @@ private void grab_dice() {
 private void move_dice() {
   if (held_dice != null) {
     Position mouse_pos = new Position(mouseX, mouseY);
-    held_dice.set_center(mouse_pos);
+    held_dice.set_centre(mouse_pos);
   }
 }
 
@@ -47,6 +47,7 @@ private void player_roll(int type) {
 // INITIALIZATON UTILITIES
 
 private DiceTray[] create_trays(Box box, int num_trays, int num_rows, boolean enable) {
+  assert(num_trays >= num_rows);
   int tray_id = 0;
   int current_num = int(num_trays / num_rows);
   
@@ -72,24 +73,11 @@ private DiceTray[] create_trays(Box box, int num_trays, int num_rows, boolean en
 }
 
 private DiceTray[] create_trays(Box box, int num_trays, int num_rows, boolean enable, float tray_side) {
-  int tray_id = 0;
-  int current_num = int(num_trays / num_rows);
-  
-  DiceTray[] result = new DiceTray[num_trays];
-  float box_height = box.get_height() * 1f / num_rows;
-  for (int i = 0; i < num_rows; i++) {
-    if (i == num_rows - 1) {
-      current_num += num_trays % num_rows;
-    }
-    float box_width = box.get_width() * 1f / current_num;
-    for (int j = 0; j < current_num; j++) {
-      Position curr_pos = new Position(box.get_corner().get_x() + box_width / 2f + j * box_width - 1f / 2 * tray_side, box.get_corner().get_y() + box_height / 2f + i * box_height - 1f / 2 * tray_side);
-      result[tray_id] = new DiceTray(curr_pos, tray_side, true, color(255));
-      if (enable) {
-        active_trays.add(result[tray_id]);
-      }
-      tray_id++;
-    }
+  DiceTray[] result = create_trays(box, num_trays, num_rows, enable);
+  for (int i = 0; i < result.length; i++) {
+    Position centre = result[i].get_centre();
+    result[i].set_side(tray_side);
+    result[i].set_centre(centre);
   }
   return result;
 }
@@ -275,18 +263,20 @@ private void make_encounter() {
   int type = int(random(0, 4));
   int num_trays = min(int(random(player_stats.get_stat(type) == 0 ? 0 : 1, player_stats.get_stat(type) + 1)), num_unlocked_player_trays);
   final LimitedDiceTray[] encounter_trays = new LimitedDiceTray[num_trays];
-  int punish_pts = 0;
-  for (int i = 0; i < 5; i++) {
-    punish_pts += (i == 4 ? 1 : 2) * player_stats.get_stat(i);
-  }
-  punish_pts = max(num_trays, int(random(punish_pts / 6 + 1)));
-  int[] tray_punishment_allocation = generate_values_array(num_trays, punish_pts, 0, 0.1);
-  DiceTray[] base_trays = create_trays(new Box(action_box.get_corner(), action_box.get_width() / 2f, action_box.get_height()), num_trays, max(1, int(num_trays / 3)), false, player_trays[0].get_side());
-  for (int i = 0; i < num_trays; i++) {
-    encounter_trays[i] = new LimitedDiceTray(base_trays[i], int(random(1, 7)), type, new Stats(generate_values_array(stat_names.length, tray_punishment_allocation[i], 0, 0.1)));
-    encounter_trays[i].get_punishment().set_stat(4, encounter_trays[i].get_punishment().get_stat(4) * 2);
-    encounter_trays[i].unlock();
-    active_trays.add(encounter_trays[i]);
+  if (num_trays > 0) {
+    int punish_pts = 0;
+    for (int i = 0; i < 5; i++) {
+      punish_pts += (i == 4 ? 1 : 2) * player_stats.get_stat(i);
+    }
+    punish_pts = max(num_trays, int(random(punish_pts / 6 + 1)));
+    int[] tray_punishment_allocation = generate_values_array(num_trays, punish_pts, 0, 0.1);
+    DiceTray[] base_trays = create_trays(new Box(action_box.get_corner(), action_box.get_width() / 2f, action_box.get_height()), num_trays, max(1, int(num_trays / 3)), false, player_trays[0].get_side());
+    for (int i = 0; i < num_trays; i++) {
+      encounter_trays[i] = new LimitedDiceTray(base_trays[i], int(random(1, 7)), type, new Stats(generate_values_array(stat_names.length, tray_punishment_allocation[i], 0, 0.1)));
+      encounter_trays[i].get_punishment().set_stat(4, encounter_trays[i].get_punishment().get_stat(4) * 2);
+      encounter_trays[i].unlock();
+      active_trays.add(encounter_trays[i]);
+    }
   }
   final Button encounter_button = new Button(new Position(action_box.get_corner().get_x() + action_box.get_width() * 3f / 4, action_box.get_corner().get_y() + action_box.get_height() / 2f), action_box.get_width() / 10f, action_box.get_height() / 4f, null, color(50, 200, 50), "DONE");
   final Button[] encounter_buttons = {encounter_button};
