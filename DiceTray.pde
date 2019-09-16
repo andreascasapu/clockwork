@@ -88,11 +88,6 @@ public class DiceTray extends UISquare{
     set_dice(other_dice);
   }
   
-  public void cleanup() {
-    cleanup_dice();
-    cleanup_trays.add(this);
-  }
-  
   @Override
   public void show() {
     if (is_locked()) {
@@ -102,5 +97,11 @@ public class DiceTray extends UISquare{
     } else {
       super.show();
     }
+  }
+  
+  @Override
+  public void cleanup() {
+    cleanup_dice();
+    cleanup_trays.add(this);
   }
 }

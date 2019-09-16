@@ -58,11 +58,7 @@ void draw() {
   showables.add(active_trays);
   showables.add(active_buttons);
   showables.add(active_dice);
-  /*draw_layout();
-  draw_dice_trays();
-  draw_buttons();
-  draw_dice();
-  draw_scenes();*/
+  
   stats_scene.cleanup();
   update_stats_scene();
   for (int i = 0; i < showables.size(); i++) {
@@ -73,7 +69,17 @@ void draw() {
   if (held_dice != null) {
     held_dice.show();
   }
-  cleanup_elements();
+  
+  List<Set<? extends Showable>> cleanups = new ArrayList<Set<? extends Showable>>();
+  cleanups.add(cleanup_ui_boxes);
+  cleanups.add(cleanup_scenes);
+  cleanups.add(cleanup_trays);
+  cleanups.add(cleanup_buttons);
+  cleanups.add(cleanup_dice);
+  assert(showables.size() == cleanups.size());
+  for (int i = 0; i < cleanups.size(); i++) {
+    cleanup_set_from(cleanups.get(i), showables.get(i));
+  }
 }
 
 void mouseDragged() {

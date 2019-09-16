@@ -36,10 +36,6 @@ public class Button extends UIBox{
     to_run.run();
   }
   
-  public void cleanup() {
-    cleanup_buttons.add(this);
-  }
-  
   @Override
   public void show() {
     if (is_pressed()) {
@@ -50,6 +46,11 @@ public class Button extends UIBox{
     float leading_scalar = 5f / 3;
     float horizontal_scalar = 2f / 3;
     float vertical_scalar = 2f / 3;
-    print_text_in_box(get_text(), cp_gothic, color(255), this, leading_scalar, horizontal_scalar, vertical_scalar);
+    new TextBox(this, get_text(), color(255)).show(leading_scalar, horizontal_scalar, vertical_scalar);
+  }
+  
+  @Override
+  public void cleanup() {
+    cleanup_buttons.add(this);
   }
 }

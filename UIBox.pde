@@ -28,7 +28,13 @@ public class UIBox extends Box implements Showable{
     rect(get_corner().get_x(), get_corner().get_y(), get_width(), get_height());
   }
   
+  @Override
   public void show() {
     show(get_color());
+  }
+  
+  @Override
+  public void cleanup() {
+    cleanup_ui_boxes.add(this);
   }
 }

@@ -1,4 +1,4 @@
-public class Dice extends UISquare{
+public class Dice extends UISquare implements Showable{
   
   private int value;
   private DiceTray tray;
@@ -39,11 +39,6 @@ public class Dice extends UISquare{
     return type;
   }
   
-  public void cleanup() {
-    cleanup_dice.add(this);
-    get_tray().set_dice(null);
-  }
-  
   @Override
   public void show() {
     if (this == held_dice) {
@@ -57,6 +52,12 @@ public class Dice extends UISquare{
     float leading_scalar = 5f / 3;
     float horizontal_scalar = 2f / 3;
     float vertical_scalar = 2f / 3;
-    print_text_in_box(Integer.toString(get_value()), cp_gothic, color(0), this, leading_scalar, horizontal_scalar, vertical_scalar);
+    new TextBox(this, Integer.toString(get_value()), color(0)).show(leading_scalar, horizontal_scalar, vertical_scalar);
+  }
+  
+  @Override
+  public void cleanup() {
+    cleanup_dice.add(this);
+    get_tray().set_dice(null);
   }
 }

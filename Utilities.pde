@@ -177,29 +177,6 @@ private float find_font_size(Box text_box, String text, float leading_scalar) {
   return font_size;
 }
 
-private void print_text_in_box(String text, PFont font, color col, Box box, float leading_scalar, float horizontal_scalar, float vertical_scalar) {
-  float new_width = box.get_width() * horizontal_scalar;
-  float new_height = box.get_height() * vertical_scalar;
-  Position new_corner = new Position(box.get_corner().get_x() + (box.get_width() - new_width) / 2f, box.get_corner().get_y() + (box.get_height() - new_height) / 2f);
-  Box print_box = new Box(new_corner, new_width, new_height);
-  float font_size = find_font_size(print_box, text, leading_scalar);
-  textFont(font, font_size);
-  textLeading(font_size * leading_scalar);
-  fill(col);
-  text(text, print_box.get_corner().get_x() + print_box.get_width() / 2f, print_box.get_corner().get_y() + print_box.get_height() / 2f);
-}
-
-private void print_text_in_box(float font_size, String text, PFont font, color col, Box box, float leading_scalar, float horizontal_scalar, float vertical_scalar) {
-  float new_width = box.get_width() * horizontal_scalar;
-  float new_height = box.get_height() * vertical_scalar;
-  Position new_corner = new Position(box.get_corner().get_x() + (box.get_width() - new_width) / 2f, box.get_corner().get_y() + (box.get_height() - new_height) / 2f);
-  Box print_box = new Box(new_corner, new_width, new_height);
-  textFont(font, font_size);
-  textLeading(font_size * leading_scalar);
-  fill(col);
-  text(text, print_box.get_corner().get_x() + print_box.get_width() / 2f, print_box.get_corner().get_y() + print_box.get_height() / 2f);
-}
-
 private float find_minimum_font_size_in_group(TextBox[] boxes, float leading_scalar, float horizontal_scalar, float vertical_scalar) {
   float min_size = 1000000;
   for (int i = 0; i < boxes.length; i++) {
@@ -221,7 +198,7 @@ private void cleanup_set_from(Set<?> to_remove, Set<?> from) {
   }
   to_remove.clear();
 }
-
+/*
 private void cleanup_elements() {
   cleanup_set_from(cleanup_dice, active_dice);
   cleanup_set_from(cleanup_buttons, active_buttons);
@@ -229,7 +206,7 @@ private void cleanup_elements() {
   cleanup_set_from(cleanup_trays, active_trays);
   cleanup_set_from(cleanup_ui_boxes, active_ui_boxes);
 }
-
+*/
 // BUTTON UTILITIES
 
 private void depress_button() {
@@ -279,9 +256,9 @@ private void make_encounter() {
     }
   }
   final Button encounter_button = new Button(new Position(action_box.get_corner().get_x() + action_box.get_width() * 3f / 4, action_box.get_corner().get_y() + action_box.get_height() / 2f), action_box.get_width() / 10f, action_box.get_height() / 4f, null, color(50, 200, 50), "DONE");
-  final Button[] encounter_buttons = {encounter_button};
   active_buttons.add(encounter_button);
-  final Scene encounter = new Scene(new TextBox[0], encounter_trays, encounter_buttons, new Stats(generate_values_array(stat_names.length, punish_pts, 0, 0.1)));
+  final Button[] encounter_buttons = {encounter_button};
+  final Encounter encounter = new Encounter(new TextBox[0], encounter_buttons, encounter_trays, new Stats(generate_values_array(stat_names.length, punish_pts, 0, 0.1)));
   active_scenes.add(encounter);
   encounter_button.set_to_run(new Runnable(){public void run(){
   for (LimitedDiceTray tray : encounter_trays) {
