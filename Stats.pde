@@ -23,21 +23,40 @@ public class Stats {
     return body;
   }
   
+  public void set_body(int new_body) {
+    body = new_body;
+  }
+  
   public int get_wits() {
     return wits;
   }
   
+  public void set_wits(int new_wits) {
+    body = new_wits;
+  }
   
   public int get_craft() {
     return craft;
+  }
+  
+  public void set_craft(int new_craft) {
+    body = new_craft;
   }
   
   public int get_luck() {
     return luck;
   }
   
+  public void set_luck(int new_luck) {
+    body = new_luck;
+  }
+  
   public int get_life() {
     return life;
+  }
+  
+  public void set_life(int new_life) {
+    body = new_life;
   }
   
   public int get_stat(int id) {

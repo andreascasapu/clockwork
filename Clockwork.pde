@@ -18,7 +18,7 @@ private Set<DiceTray> cleanup_trays = new HashSet();
 private Set<UIBox> active_ui_boxes = new HashSet();
 private Set<UIBox> cleanup_ui_boxes = new HashSet();
 
-private String[] stat_names = {"BODY", "WITS", "CRAFT", "LUCK", "HEALTH"};
+private String[] stat_names = {"BODY", "WITS", "CRAFT", "LUCK", "LIFE"};
 private color stat_cols[] = {color(60, 120, 180), color(110, 50, 150), color(160, 40, 40), color(100, 170, 80), color(255)};
 
 private UIBox info_box;
@@ -30,7 +30,7 @@ private Stats player_stats;
 
 private Scene stats_scene;
 
-void setup() {
+public void setup() {
   size(1080, 720);
   //fullScreen();
   cp_gothic = loadFont("CopperplateGothic-Bold-18.vlw");
@@ -51,7 +51,14 @@ void setup() {
   make_encounter();
 }
 
-void draw() {
+public void reset() {
+  stats_scene.cleanup();
+  create_player_stats();
+  update_stats_scene();
+  make_encounter();
+}
+
+public void draw() {
   List<Set<? extends Showable>> showables = new ArrayList<Set<? extends Showable>>();
   showables.add(active_ui_boxes);
   showables.add(active_scenes);
@@ -82,17 +89,17 @@ void draw() {
   }
 }
 
-void mouseDragged() {
+public void mouseDragged() {
   move_dice();
   cancel_button_press();
 }
 
-void mousePressed() {
+public void mousePressed() {
   grab_dice();
   depress_button();
 }
 
-void mouseReleased() {
+public void mouseReleased() {
   drop_dice();
   press_button();
 }

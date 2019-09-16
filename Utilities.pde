@@ -198,15 +198,7 @@ private void cleanup_set_from(Set<?> to_remove, Set<?> from) {
   }
   to_remove.clear();
 }
-/*
-private void cleanup_elements() {
-  cleanup_set_from(cleanup_dice, active_dice);
-  cleanup_set_from(cleanup_buttons, active_buttons);
-  cleanup_set_from(cleanup_scenes, active_scenes);
-  cleanup_set_from(cleanup_trays, active_trays);
-  cleanup_set_from(cleanup_ui_boxes, active_ui_boxes);
-}
-*/
+
 // BUTTON UTILITIES
 
 private void depress_button() {
@@ -258,7 +250,9 @@ private void make_encounter() {
   final Button encounter_button = new Button(new Position(action_box.get_corner().get_x() + action_box.get_width() * 3f / 4, action_box.get_corner().get_y() + action_box.get_height() / 2f), action_box.get_width() / 10f, action_box.get_height() / 4f, null, color(50, 200, 50), "DONE");
   active_buttons.add(encounter_button);
   final Button[] encounter_buttons = {encounter_button};
-  final Encounter encounter = new Encounter(new TextBox[0], encounter_buttons, encounter_trays, new Stats(generate_values_array(stat_names.length, punish_pts, 0, 0.1)));
+  final Stats encounter_reward = new Stats(generate_values_array(stat_names.length, round(punish_pts / 2f), 0, 0.1));
+  encounter_reward.set_life(encounter_reward.get_life() * 2);
+  final Encounter encounter = new Encounter(new TextBox[0], encounter_buttons, encounter_trays, encounter_reward);
   active_scenes.add(encounter);
   encounter_button.set_to_run(new Runnable(){public void run(){
   for (LimitedDiceTray tray : encounter_trays) {
@@ -269,9 +263,19 @@ private void make_encounter() {
   for (int i = 0; i < num_player_trays; i++) {
     player_trays[i].delete_dice();
   }
-  encounter.get_reward().apply_to_player(1);
-  encounter.cleanup();
-  make_encounter();
+  int stat_sum = 0;
+  for (int i = 0; i < 5; i++) {
+    stat_sum += player_stats.get_stat(i);
+  }
+  if (stat_sum == 0 || player_stats.get_life() == 0) {
+    encounter.cleanup();
+    reset();
+  } else {
+    encounter.get_reward().apply_to_player(1);
+    encounter.cleanup();
+    make_encounter();
+  }
+  
   }});
   player_roll(type);
 }
