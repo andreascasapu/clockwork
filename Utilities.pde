@@ -48,6 +48,7 @@ private void player_roll(int type) {
 
 private DiceTray[] create_trays(Box box, int num_trays, int num_rows, boolean enable) {
   assert(num_trays >= num_rows);
+  print(difficulty, ": ", num_trays, ' ', num_rows, '\n');
   int tray_id = 0;
   int current_num = int(num_trays / num_rows);
   
@@ -76,7 +77,7 @@ private DiceTray[] create_trays(Box box, int num_trays, int num_rows, boolean en
   DiceTray[] result = create_trays(box, num_trays, num_rows, enable);
   for (int i = 0; i < result.length; i++) {
     Position centre = result[i].get_centre();
-    result[i].set_side(tray_side);
+    result[i].set_side(min(tray_side, result[i].get_side()));
     result[i].set_centre(centre);
   }
   return result;
@@ -230,18 +231,20 @@ private void cancel_button_press() {
 
 private void make_encounter() {
   int type = int(random(0, 4));
-  int num_trays = min(int(random(player_stats.get_stat(type) == 0 ? 0 : 1, player_stats.get_stat(type) + 1)), num_unlocked_player_trays);
+  //int num_trays = min(int(random(player_stats.get_stat(type) == 0 ? 0 : 1, player_stats.get_stat(type) + 1)), num_unlocked_player_trays);
+  int num_trays = round(random(difficulty * 0.25, difficulty * 0.5));
   final LimitedDiceTray[] encounter_trays = new LimitedDiceTray[num_trays];
-  int punish_pts = 0;
+  /*int punish_pts = 0;
   for (int i = 0; i < 5; i++) {
     punish_pts += (i == 4 ? 1 : 2) * player_stats.get_stat(i);
   }
-  punish_pts = max(num_trays, int(random(punish_pts / 6 + 1)));
+  punish_pts = max(num_trays, int(random(punish_pts / 6 + 1)));*/
   if (num_trays > 0) {
-    int[] tray_punishment_allocation = generate_values_array(num_trays, punish_pts, 0, 0.1);
-    DiceTray[] base_trays = create_trays(new Box(action_box.get_corner(), action_box.get_width() / 2f, action_box.get_height()), num_trays, max(1, int(num_trays / 3)), false, player_trays[0].get_side());
+    //int[] tray_punishment_allocation = generate_values_array(num_trays, punish_pts, 0, 0.1);
+    int[] tray_punishment_allocation = generate_values_array(num_trays, round(difficulty * num_trays * 0.75), 0, 0.1);
+    DiceTray[] base_trays = create_trays(new Box(action_box.get_corner(), action_box.get_width() / 2f, action_box.get_height()), num_trays, max(1, round(num_trays / 3f)), false, player_trays[0].get_side());
     for (int i = 0; i < num_trays; i++) {
-      encounter_trays[i] = new LimitedDiceTray(base_trays[i], int(random(1, 7)), type, new Stats(generate_values_array(stat_names.length, tray_punishment_allocation[i], 0, 0.1)));
+      encounter_trays[i] = new LimitedDiceTray(base_trays[i], int(random(1, 7)), type, new Stats(generate_values_array(stat_names.length, tray_punishment_allocation[i], 0.1, 0.1)));
       encounter_trays[i].get_punishment().set_stat(4, encounter_trays[i].get_punishment().get_stat(4) * 2);
       encounter_trays[i].unlock();
       active_trays.add(encounter_trays[i]);
@@ -250,7 +253,8 @@ private void make_encounter() {
   final Button encounter_button = new Button(new Position(action_box.get_corner().get_x() + action_box.get_width() * 3f / 4, action_box.get_corner().get_y() + action_box.get_height() / 2f), action_box.get_width() / 10f, action_box.get_height() / 4f, null, color(50, 200, 50), "DONE");
   active_buttons.add(encounter_button);
   final Button[] encounter_buttons = {encounter_button};
-  final Stats encounter_reward = new Stats(generate_values_array(stat_names.length, round(punish_pts / 2f), 0, 0.1));
+  //final Stats encounter_reward = new Stats(generate_values_array(stat_names.length, round(punish_pts / 2f), 0, 0.1));
+  final Stats encounter_reward = new Stats(generate_values_array(stat_names.length, round(difficulty * 0.6), 0, 0.1));
   encounter_reward.set_life(encounter_reward.get_life() * 2);
   final Encounter encounter = new Encounter(new TextBox[0], encounter_buttons, encounter_trays, encounter_reward);
   active_scenes.add(encounter);
@@ -267,6 +271,11 @@ private void make_encounter() {
   for (int i = 0; i < 5; i++) {
     stat_sum += player_stats.get_stat(i);
   }
+  if ((difficulty + 2) / 5 > difficulty / 5 && num_unlocked_player_trays < 10) {
+     player_trays[num_unlocked_player_trays].unlock();
+     num_unlocked_player_trays++;
+  }
+  difficulty += 2;
   if (stat_sum == 0 || player_stats.get_life() == 0) {
     encounter.cleanup();
     reset();
@@ -275,7 +284,6 @@ private void make_encounter() {
     encounter.cleanup();
     make_encounter();
   }
-  
   }});
   player_roll(type);
 }

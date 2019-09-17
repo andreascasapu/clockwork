@@ -3,8 +3,9 @@ import java.util.*;
 private PFont cp_gothic;
 
 private final int num_player_trays = 10;
-private final int num_unlocked_player_trays = 3;
+private int num_unlocked_player_trays = 3;
 private DiceTray player_trays[] = new DiceTray[num_player_trays];
+private int difficulty;
 
 private Dice held_dice = null;
 private Set<Dice> active_dice = new HashSet();
@@ -48,13 +49,19 @@ public void setup() {
   for (int i = 0; i < 3; i++) {
     player_trays[i].unlock();
   }
+  difficulty = 2;
   make_encounter();
 }
 
 public void reset() {
+  difficulty = 2;
   stats_scene.cleanup();
   create_player_stats();
   update_stats_scene();
+  while (num_unlocked_player_trays > 3) {
+    num_unlocked_player_trays--;
+    player_trays[num_unlocked_player_trays].lock();
+  }
   make_encounter();
 }
 
