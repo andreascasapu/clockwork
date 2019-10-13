@@ -1,0 +1,2 @@
+The application has been exported to the "application." set of folders. Run the one appropriate to the OS and architecture.
+Download processing here https://processing.org/download/ in order to edit and run the new code.
